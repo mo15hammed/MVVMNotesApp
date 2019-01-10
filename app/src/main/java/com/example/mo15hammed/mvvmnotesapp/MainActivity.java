@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NotesRecyclerAdapter.OnNoteClickListener {
 
     private static final String TAG = "MainActivity";
     public static final int ADD_NOTE_REQUEST = 1;
@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton mAddNote;
 
     private Note deletedNote;
-    private List<Note> backupNotesList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         mNotesRecycler.setLayoutManager(new LinearLayoutManager(this));
         mNotesRecycler.setHasFixedSize(true);
         notesAdapter = new NotesRecyclerAdapter();
+        notesAdapter.setOnNoteClickListener(this);
         mNotesRecycler.setAdapter(notesAdapter);
 
 
@@ -84,27 +84,12 @@ public class MainActivity extends AppCompatActivity {
                 mySnackbar.setAction("UNDO", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        noteViewModel.insert(note);
+                        noteViewModel.insert(deletedNote);
                     }
                 });
                 mySnackbar.show();
             }
         }).attachToRecyclerView(mNotesRecycler);
-
-
-        notesAdapter.setOnItemClickListener(new NotesRecyclerAdapter.OnItemClickListener() {
-            @Override
-            public void onItemCLick(Note note) {
-
-                Intent editIntent = new Intent(MainActivity.this, AddEditNoteActivity.class);
-                editIntent.putExtra(AddEditNoteActivity.EXTRA_ID, note.getUid());
-                editIntent.putExtra(AddEditNoteActivity.EXTRA_TITLE, note.getTitle());
-                editIntent.putExtra(AddEditNoteActivity.EXTRA_DESCRIPTION, note.getDescription());
-                editIntent.putExtra(AddEditNoteActivity.EXTRA_PRIORITY, note.getPriority());
-                startActivityForResult(editIntent, EDIT_NOTE_REQUEST);
-
-            }
-        });
 
     }
 
@@ -165,6 +150,16 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    @Override
+    public void onNoteClick(Note note) {
+        Intent editIntent = new Intent(MainActivity.this, AddEditNoteActivity.class);
+        editIntent.putExtra(AddEditNoteActivity.EXTRA_ID, note.getUid());
+        editIntent.putExtra(AddEditNoteActivity.EXTRA_TITLE, note.getTitle());
+        editIntent.putExtra(AddEditNoteActivity.EXTRA_DESCRIPTION, note.getDescription());
+        editIntent.putExtra(AddEditNoteActivity.EXTRA_PRIORITY, note.getPriority());
+        startActivityForResult(editIntent, EDIT_NOTE_REQUEST);
     }
 }
 

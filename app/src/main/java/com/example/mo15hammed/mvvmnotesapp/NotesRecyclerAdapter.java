@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class NotesRecyclerAdapter extends ListAdapter<Note, NotesRecyclerAdapter.NotesViewHolder> {
 
-    private OnItemClickListener listener;
+    private OnNoteClickListener mNoteClickListener;
 
     public NotesRecyclerAdapter() {
         super(DIFF_CALLBACK);
@@ -53,7 +53,7 @@ public class NotesRecyclerAdapter extends ListAdapter<Note, NotesRecyclerAdapter
         return getItem(position);
     }
 
-    class NotesViewHolder extends RecyclerView.ViewHolder {
+    class NotesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView mTitle, mDescription, mPriority;
 
@@ -64,23 +64,23 @@ public class NotesRecyclerAdapter extends ListAdapter<Note, NotesRecyclerAdapter
             mDescription = itemView.findViewById(R.id.txt_description);
             mPriority = itemView.findViewById(R.id.txt_priority);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            itemView.setOnClickListener(this);
 
-                    int position = getAdapterPosition();
-                    if (listener != null)
-                        listener.onItemCLick(getItem(position));
-                }
-            });
+        }
+
+        @Override
+        public void onClick(View v) {
+            mNoteClickListener.onNoteClick(getItem(getAdapterPosition()));
         }
     }
 
-    public interface OnItemClickListener {
-        void onItemCLick(Note note);
+
+    public interface OnNoteClickListener {
+        void onNoteClick(Note note);
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
+    public void setOnNoteClickListener(OnNoteClickListener listener) {
+        this.mNoteClickListener = listener;
     }
+
 }
